@@ -31,7 +31,7 @@ public class FissionReactor {
     private double totNeutronSources;
     private double avgGeometricFactorSlowNeutrons;
     private double avgGeometricFactorFastNeutrons;
-    private int geometricIntegrationSteps;
+    private int geometricIntegrationSteps = 5;
 
     private double lSlow;
     private double lFast;
@@ -69,7 +69,7 @@ public class FissionReactor {
     public double power;
     public double prevPower;
     public double temperature;
-    public double pressure;
+    public double pressure = standardPressure;
     public double exteriorPressure;
     public double coolantBoilingPointStandardPressure;
     public double coolantHeatOfVaporization;
@@ -82,8 +82,8 @@ public class FissionReactor {
     public double envTemperature;
     public double accumulatedHydrogen;
 
-    public double maxTemperature;
-    public double maxPressure;
+    public double maxTemperature = Double.MAX_VALUE;
+    public double maxPressure = Double.MAX_VALUE;
     public double maxPower;
 
     public double coolingFactor;
@@ -106,8 +106,9 @@ public class FissionReactor {
         return Math.max(value * criticalRate / rate * Math.sqrt(target / value), equilibrium);
     }
 
-    public FissionReactor(int size) {
+    public FissionReactor(int size, int depth) {
         reactorLayout = new ReactorComponent[size][size];
+        reactorDepth = depth;
         fuelRods = new ArrayList<>();
         controlRods = new ArrayList<>();
         coolantChannels = new ArrayList<>();
@@ -208,7 +209,7 @@ public class FissionReactor {
                     }
 
                     /*
-                     * We keep track of which active elements we hit, so we can determined how important they are
+                     * We keep track of which active elements we hit, so we can determine how important they are
                      * relative to the others later
                      */
                     if (component instanceof ControlRod) {
@@ -396,7 +397,7 @@ public class FissionReactor {
     }
 
     public double voidContribution() {
-        return this.voidFactor() * (this.temperature > this.coolantBoilingPoint() ? this.maxPressure : 0.);
+        return this.temperature > this.coolantBoilingPoint() ? this.voidFactor() * this.maxPressure : 0.;
     }
 
     public void updatePower() {
