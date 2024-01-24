@@ -57,7 +57,7 @@ public class FissionReactor {
     /**
      * Integers used on variables with direct player control for easier adjustments
      */
-    public int controlRodInsertion;
+    public int controlRodInsertion = 1;
     public int reactorDepth;
     public int reactorRadius;
 
@@ -306,17 +306,6 @@ public class FissionReactor {
         avgCoolantTemperature /= coolantChannels.size();
 
         this.prepareInitialConditions();
-
-        for (CoolantChannel channel : effectiveCoolantChannels) {
-            temperature += channel.getCoolant().getFluid().getTemperature() * channel.getWeight();
-            avgBoilingPoint += channel.getCoolant().getProperty(PropertyKey.COOLANT).getBoilingPoint() *
-                    channel.getWeight();
-            avgAbsorption += channel.getCoolant().getProperty(PropertyKey.COOLANT).getAbsorption() *
-                    channel.getWeight();
-            avgModeration += channel.getCoolant().getProperty(PropertyKey.COOLANT).getModerationFactor() *
-                    channel.getWeight();
-            avgPressure += channel.getCoolant().getProperty(PropertyKey.COOLANT).getPressure() * channel.getWeight();
-        }
 
         kEff = 1. * k;
     }

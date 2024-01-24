@@ -89,15 +89,27 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
     protected ModularUI.Builder createUITemplate(EntityPlayer entityPlayer) {
         ModularUI.Builder builder = ModularUI.builder(GuiTextures.BACKGROUND, 176, 166).shouldColor(false)
                 .widget(new SliderWidget("Flow Rate", 50, 50, 100, 18, 0.0f, 10000.f, flowRate, this::setFlowRate))
-                .widget(new ToggleButtonWidget(50, 80, 18, 18, this::isLocked, this::tryLocking));
-        builder.widget(new AdvancedTextWidget(50, 110, getLockingStateText(), 0xFFFFFF));
+                .widget(new ToggleButtonWidget(50, 80, 18, 18, this::isLocked, this::tryLocking))
 
+        builder.widget(new AdvancedTextWidget(50, 110, getLockingStateText(), 0xFFFFFF));
+        builder.bindPlayerInventory(entityPlayer.inventory);
+        if(this.fissionReactor != null) {
+            builder.widget(new SliderWidget("Control Rod Depth", 40, 30, 80, 18, 0.0f, 15.0f, getControlRodInsertionValue(), this::setControlRodInsertionValue));
+        }
         return builder;
     }
 
     private void setFlowRate(float flowrate) {
         this.flowRate = (int)flowrate;
         if(flowRate < 1) flowRate = 1;
+    }
+
+    private void setControlRodInsertionValue(float value) {
+        this.fissionReactor.controlRodInsertion = (int)value;
+    }
+
+    private float getControlRodInsertionValue() {
+        return (float)this.fissionReactor.controlRodInsertion;
     }
 
     private boolean isLocked() {
