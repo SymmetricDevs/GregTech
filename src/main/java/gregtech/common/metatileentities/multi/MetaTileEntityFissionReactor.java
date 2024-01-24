@@ -8,9 +8,7 @@ import gregtech.api.gui.GuiTextures;
 import gregtech.api.gui.ModularUI;
 import gregtech.api.gui.Widget;
 import gregtech.api.gui.widgets.AdvancedTextWidget;
-import gregtech.api.gui.widgets.LabelWidget;
 import gregtech.api.gui.widgets.SliderWidget;
-import gregtech.api.gui.widgets.TextFieldWidget;
 import gregtech.api.gui.widgets.ToggleButtonWidget;
 import gregtech.api.metatileentity.IDataInfoProvider;
 import gregtech.api.metatileentity.MetaTileEntity;
@@ -64,8 +62,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static gregtech.api.gui.widgets.AdvancedTextWidget.withButton;
-
 public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase implements IDataInfoProvider {
 
     private FissionReactor fissionReactor;
@@ -90,26 +86,24 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
         ModularUI.Builder builder = ModularUI.builder(GuiTextures.BACKGROUND, 176, 166).shouldColor(false)
                 .widget(new SliderWidget("Flow Rate", 50, 50, 100, 18, 0.0f, 10000.f, flowRate, this::setFlowRate))
                 .widget(new ToggleButtonWidget(50, 80, 18, 18, this::isLocked, this::tryLocking))
-
+                .widget(new SliderWidget("Control Rod Depth", 40, 30, 80, 18, 0.0f, 15.0f,
+                        getControlRodInsertionValue(), this::setControlRodInsertionValue));
         builder.widget(new AdvancedTextWidget(50, 110, getLockingStateText(), 0xFFFFFF));
         builder.bindPlayerInventory(entityPlayer.inventory);
-        if(this.fissionReactor != null) {
-            builder.widget(new SliderWidget("Control Rod Depth", 40, 30, 80, 18, 0.0f, 15.0f, getControlRodInsertionValue(), this::setControlRodInsertionValue));
-        }
         return builder;
     }
 
     private void setFlowRate(float flowrate) {
-        this.flowRate = (int)flowrate;
-        if(flowRate < 1) flowRate = 1;
+        this.flowRate = (int) flowrate;
+        if (flowRate < 1) flowRate = 1;
     }
 
     private void setControlRodInsertionValue(float value) {
-        this.fissionReactor.controlRodInsertion = (int)value;
+        this.fissionReactor.controlRodInsertion = (int) value;
     }
 
     private float getControlRodInsertionValue() {
-        return (float)this.fissionReactor.controlRodInsertion;
+        return (float) this.fissionReactor.controlRodInsertion;
     }
 
     private boolean isLocked() {
@@ -117,10 +111,10 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
     }
 
     private void tryLocking(boolean lock) {
-        if(!isStructureFormed())
+        if (!isStructureFormed())
             return;
 
-        if(lock)
+        if (lock)
             lockAndPrepareReactor();
         else
             unlockAll();
