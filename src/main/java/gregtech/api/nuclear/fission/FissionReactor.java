@@ -42,7 +42,7 @@ public class FissionReactor {
     private double avgCoolantTemperature;
     private double controlRodFactor;
 
-    private double kEff;
+    private double kEff; // criticality value
 
     private double avgBoilingPoint;
     private double avgAbsorption;
@@ -52,41 +52,53 @@ public class FissionReactor {
     /**
      * Thresholds important for determining the evolution of the reactor
      */
-    public int criticalRodInsertion;
+    public int criticalRodInsertion; // determined by k value
 
     /**
-     * Integers used on variables with direct player control for easier adjustments
+     * Integers used on variables with direct player control for easier adjustments (normalize this to 0,1)
      */
     public int controlRodInsertion = 1;
     public int reactorDepth;
     public int reactorRadius;
 
-    public boolean moderatorTipped;
+    public boolean moderatorTipped; // set by the type of control rod in the reactor(prepInitialConditions)
 
     /**
      * Megawatts
      */
     public double power;
     public double prevPower;
+    /**
+     * Temperature of the reactor
+     */
     public double temperature;
     public double pressure = standardPressure;
-    public double exteriorPressure;
-    public double coolantBoilingPointStandardPressure;
+    public double exteriorPressure = standardPressure;
+    /**
+     * Temperature of boiling point in kelvin
+     */
+    public double coolantBoilingPointStandardPressure; // if we want multiple coolants, use weights for each coolant channel and average
+    /**
+     * Latent heat of vaporization in J/mol
+     */
     public double coolantHeatOfVaporization;
     public double coolantBaseTemperature;
     public double fuelDepletion = 1;
     public double prevFuelDepletion;
-    public double heatRemoved;
-    public double neutronPoisonAmount;
+    public double heatRemoved; // needs logic somewhere(coolantPropery.coolantFactor * flowrate)
+    public double neutronPoisonAmount; // can kill reactor if power is lowered and this value is high
     public double decayProductsAmount;
-    public double envTemperature;
+    public double envTemperature; // maybe gotten from config per dim
     public double accumulatedHydrogen;
 
     public double maxTemperature = Double.MAX_VALUE;
     public double maxPressure = Double.MAX_VALUE;
-    public double maxPower;
+    public double maxPower; // determined by the amount of fuel in reactor and neutron matricies
 
-    public double coolingFactor;
+    /**
+     *
+     */
+    public double coolingFactor; // same as the other cooling stuff(weighted with the channels)
 
     protected static double responseFunction(double target, double value, double criticalRate, double rate) {
         if (value <= 0) {
@@ -106,9 +118,10 @@ public class FissionReactor {
         return Math.max(value * criticalRate / rate * Math.sqrt(target / value), equilibrium);
     }
 
-    public FissionReactor(int size, int depth) {
+    public FissionReactor(int size, int depth, int controlRodInsertion) {
         reactorLayout = new ReactorComponent[size][size];
         reactorDepth = depth;
+        this.controlRodInsertion = controlRodInsertion;
         fuelRods = new ArrayList<>();
         controlRods = new ArrayList<>();
         coolantChannels = new ArrayList<>();
@@ -199,7 +212,7 @@ public class FissionReactor {
                     mij += component.getModerationFactor();
 
                     /*
-                     * For simplicity we pretend that fuel rods are completely opaque to neutrons, paths that hit fuel
+                     * For simplicity, we pretend that fuel rods are completely opaque to neutrons, paths that hit fuel
                      * rods are ignored as obstructed
                      */
                     if (component instanceof FuelRod && component.samePositionAs(fuelRods.get(i)) &&

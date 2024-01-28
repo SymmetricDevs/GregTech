@@ -70,6 +70,7 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
     private int heightBottom;
     private int height;
     private int flowRate = 1;
+    private int controlRodInsertionValue = 4;
     private LockingState lockingState = LockingState.UNLOCKED;
 
     public MetaTileEntityFissionReactor(ResourceLocation metaTileEntityId) {
@@ -83,13 +84,13 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
 
     @Override
     protected ModularUI.Builder createUITemplate(EntityPlayer entityPlayer) {
-        ModularUI.Builder builder = ModularUI.builder(GuiTextures.BACKGROUND, 176, 166).shouldColor(false)
+        ModularUI.Builder builder = ModularUI.builder(GuiTextures.BACKGROUND, 176, 266).shouldColor(false)
                 .widget(new SliderWidget("Flow Rate", 50, 50, 100, 18, 0.0f, 10000.f, flowRate, this::setFlowRate))
                 .widget(new ToggleButtonWidget(50, 80, 18, 18, this::isLocked, this::tryLocking))
                 .widget(new SliderWidget("Control Rod Depth", 40, 30, 80, 18, 0.0f, 15.0f,
-                        getControlRodInsertionValue(), this::setControlRodInsertionValue));
+                        controlRodInsertionValue, this::setControlRodInsertionValue));
         builder.widget(new AdvancedTextWidget(50, 110, getLockingStateText(), 0xFFFFFF));
-        builder.bindPlayerInventory(entityPlayer.inventory);
+        builder.bindPlayerInventory(entityPlayer.inventory, 150);
         return builder;
     }
 
@@ -99,11 +100,9 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
     }
 
     private void setControlRodInsertionValue(float value) {
-        this.fissionReactor.controlRodInsertion = (int) value;
-    }
-
-    private float getControlRodInsertionValue() {
-        return (float) this.fissionReactor.controlRodInsertion;
+        if(lockingState == LockingState.LOCKED)
+            return;
+        this.controlRodInsertionValue = (int) value;
     }
 
     private boolean isLocked() {
@@ -420,7 +419,7 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
         this.height = this.heightTop + this.heightBottom + 1;
         if (data.getBoolean("locked")) {
             this.lockingState = LockingState.SHOULD_LOCK;
-        } ;
+        }
     }
 
     @Override
@@ -477,7 +476,7 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
         for (ILockableHandler handler : this.getAbilities(MultiblockAbility.IMPORT_FUEL_ROD)) {
             handler.setLock(false);
         }
-        this.fissionReactor = null;
+        //this.fissionReactor = null;
         this.lockingState = LockingState.UNLOCKED;
     }
 
@@ -490,7 +489,7 @@ public class MetaTileEntityFissionReactor extends MultiblockWithDisplayBase impl
 
     private void lockAndPrepareReactor() {
         this.lockAll();
-        fissionReactor = new FissionReactor(this.diameter - 2, this.height - 2);
+        fissionReactor = new FissionReactor(this.diameter - 2, this.height - 2, controlRodInsertionValue);
         int radius = (int) this.diameter / 2;     // This is the floor of the radius, the actual radius is 0.5 blocks
                                                   // larger
         BlockPos reactorOrigin = this.getPos().offset(this.frontFacing.getOpposite(), radius);
