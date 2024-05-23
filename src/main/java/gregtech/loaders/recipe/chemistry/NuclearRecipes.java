@@ -95,20 +95,22 @@ public class NuclearRecipes {
                 .buildAndRegister();
 
         MIXER_RECIPES.recipeBuilder().duration(200).EUt(VA[EV])
-                .input(dust, Zirconium, 16)
-                .fluidInputs(Tin.getFluid(32))
-                .fluidInputs(Chrome.getFluid(2))
-                .output(dust, Zircaloy, 16)
+                .input(dust, Zirconium, 62)
+                .input(dustTiny, Tin, 6)
+                .input(dustTiny, Iron, 2)
+                .input(dustTiny, Chrome, 1)
+                .output(dust, Zircaloy, 62)
                 .buildAndRegister();
 
         // Inconel 718
         MIXER_RECIPES.recipeBuilder().duration(200).EUt(VA[EV])
-                .input(dust, Nickel, 5)
-                .input(dust, Chrome, 2)
-                .input(dust, Iron, 2)
-                .fluidInputs(Niobium.getFluid(72))
-                .fluidInputs(Molybdenum.getFluid(48))
-                .output(dust, Inconel, 10)
+                .input(dust, Nickel, 22)
+                .input(dust, Chrome, 8)
+                .input(dust, Iron, 8)
+                .input(dustSmall, Niobium, 5)
+                .input(dustSmall, Molybdenum, 3)
+                .input(dustSmall, Titanium, 2)
+                .output(dust, Inconel, 40)
                 .buildAndRegister();
 
         // LEU-235 Dioxide

@@ -1587,13 +1587,6 @@ public class FirstDegreeMaterials {
                 .build()
                 .setFormula("PuO2", true);
 
-        Zircaloy = new Material.Builder(456, gregtechId("zircaloy"))
-                .dust()
-                .color(0x566570).iconSet(METALLIC)
-                .components(Zirconium, 9, Tin, 1)
-                .blast(1700, GasTier.LOW)
-                .build();
-
         LowEnrichedUraniumDioxide = new Material.Builder(457, gregtechId("low_enriched_uranium_dioxide"))
                 .gas()
                 .color(0x4BF52A) // TODO Color
@@ -1637,14 +1630,22 @@ public class FirstDegreeMaterials {
                 .components(Hafnium, 1, Chlorine, 4)
                 .build();
 
+        Zircaloy = new Material.Builder(456, gregtechId("zircaloy"))
+                .ingot().fluid()
+                .color(0xB5ADCC).iconSet(DULL)
+                .flags(GENERATE_PLATE, DISABLE_DECOMPOSITION)
+                .components(Zirconium, 1)
+                .blastTemp(2150, GasTier.MID, GTValues.VA[EV], 200)
+                .build();
+
         Inconel = new Material.Builder(463, gregtechId("inconel"))
                 .ingot().fluid()
                 .color(0x7F8F75).iconSet(SHINY)
                 .flags(GENERATE_SPRING, DISABLE_DECOMPOSITION)
-                .components(Nickel, 5, Chrome, 2, Iron, 2, Niobium, 1, Molybdenum, 1)
+                .components(Nickel, 88, Chrome, 32, Iron, 32, Niobium, 5, Molybdenum, 3, Titanium, 2)
                 .blastTemp(1610, GasTier.MID, GTValues.VA[EV], 200)
                 .build()
-                .setFormula("Ni50Cr20Fe20Ni5Mo3", true);
+                .setFormula("Ni88Cr32Fe32Nb5Mo3Ti2", true);
 
         NButanol = new Material.Builder(464, gregtechId("n_butanol"))
                 .fluid()
